@@ -46,10 +46,10 @@ const dashborad = () => {
 
     return (
         <div className="dashboard-container">
-            <Sidebar 
-                chats={Object.values(chats)} 
+            <Sidebar
+                chats={Object.values(chats)}
                 currentChat={currentChat}
-                onSelectChat={(id) => dispatch(setCurrentChat(id))} 
+                onSelectChat={(id) => dispatch(setCurrentChat(id))}
             />
             <ChatArea messages={activeMessages} currentChat={currentChat} />
         </div>

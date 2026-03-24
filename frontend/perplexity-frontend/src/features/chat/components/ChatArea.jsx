@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { useSelector } from 'react-redux';
 import '../styles/Dashboard.css';
 import { useChat } from '../hooks/useChat';
 
-const ChatArea = ({ messages = [], currentChat }) => {
+const ChatArea = ({ messages = [] }) => {
     const [inputValue, setInputValue] = useState('');
     const chat = useChat();
     const messagesEndRef = useRef(null);
+    const currentChat = useSelector(state => state.chat.currentChat);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -17,6 +20,7 @@ const ChatArea = ({ messages = [], currentChat }) => {
 
     const handleSend = () => {
         if (inputValue.trim()) {
+            console.log(currentChat)
             chat.handleSendMessage(inputValue, currentChat);
             setInputValue('');
         }
@@ -34,7 +38,11 @@ const ChatArea = ({ messages = [], currentChat }) => {
                 {messages.length > 0 ? (
                     messages.map((msg, idx) => (
                         <div key={idx} className={`message ${msg.role === 'user' ? 'user' : 'ai'}`}>
-                            {msg.content}
+                            {msg.role === 'user' ? (
+                                msg.content
+                            ) : (
+                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                            )}
                         </div>
                     ))
                 ) : (
