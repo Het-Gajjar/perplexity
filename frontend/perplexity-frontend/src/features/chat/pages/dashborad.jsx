@@ -4,8 +4,7 @@ import { useAuth } from '../../Auth/hook/useAuth'
 import { useChat } from '../hooks/useChat'
 import Sidebar from '../components/Sidebar'
 import ChatArea from '../components/ChatArea'
-import { getallchats, getallmessages } from '../services/chat.api'
-import { setChats, setCurrentChat, addMessages } from '../chat.slice'
+import { setCurrentChat } from '../chat.slice'
 import '../styles/Dashboard.css'
 
 const dashborad = () => {
@@ -17,28 +16,13 @@ const dashborad = () => {
 
     useEffect(() => {
         chatHook.initializeSocket()
-        // Load initial chats
-        getallchats().then(res => {
-            const chatsObj = {};
-            if (res.chats) {
-                res.chats.forEach(c => {
-                    chatsObj[c._id] = { id: c._id, title: c.title, messages: [] };
-                });
-            }
-            dispatch(setChats(chatsObj));
-        }).catch(err => console.error("Failed to load chats:", err));
+        chatHook.handleGetAllChats()
     }, [])
 
     // Load messages when currentChat changes
     useEffect(() => {
         if (currentChat && chats[currentChat]?.messages.length === 0) {
-            getallmessages(currentChat).then(res => {
-                if (res.messages) {
-                    res.messages.forEach(msg => {
-                        dispatch(addMessages({ chatId: currentChat, content: msg.content, role: msg.role }))
-                    })
-                }
-            }).catch(console.error)
+            chatHook.handleGetMessages(currentChat)
         }
     }, [currentChat])
 
@@ -55,5 +39,7 @@ const dashborad = () => {
         </div>
     )
 }
+
+
 
 export default dashborad

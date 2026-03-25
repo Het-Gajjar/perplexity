@@ -1,7 +1,7 @@
 import { initializeSocket } from "../services/chat.socket"
-import { sendMessage } from "../services/chat.api"
-import { useDispatch, } from "react-redux"
-import { setCurrentChat, setLoading, setError, addMessages, createChat } from "../chat.slice"
+import { sendMessage, getallchats, getallmessages } from "../services/chat.api"
+import { useDispatch } from "react-redux"
+import { setCurrentChat, setLoading, setError, addMessages, createChat, setChats } from "../chat.slice"
 
 export const useChat = () => {
 
@@ -38,8 +38,38 @@ export const useChat = () => {
         }
     }
 
+    const handleGetAllChats = async () => {
+        try {
+            const res = await getallchats();
+            if (res.chats) {
+                const chatsObj = {};
+                res.chats.forEach(c => {
+                    chatsObj[c._id] = { id: c._id, title: c.title, messages: [] };
+                });
+                dispatch(setChats(chatsObj));
+            }
+        } catch (err) {
+            console.error("Failed to load chats:", err);
+        }
+    }
+
+    const handleGetMessages = async (chatId) => {
+        try {
+            const res = await getallmessages(chatId);
+            if (res.messages) {
+                res.messages.forEach(msg => {
+                    dispatch(addMessages({ chatId, content: msg.content, role: msg.role }))
+                })
+            }
+        } catch (err) {
+            console.error("Failed to load messages:", err);
+        }
+    }
+
     return {
         initializeSocket,
-        handleSendMessage
+        handleSendMessage,
+        handleGetAllChats,
+        handleGetMessages
     }
 }
