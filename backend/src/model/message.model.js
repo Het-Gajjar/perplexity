@@ -10,12 +10,16 @@ const messageSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    role:{
+    imageUrl: {
+        type: String,
+        default: null,
+    },
+    role: {
         type: String,
         enum: ["user", "ai"],
-        required: true, 
+        required: true,
     }
 })
-const MessageModel=mongoose.model("message",messageSchema)
+const MessageModel = mongoose.model("message", messageSchema)
 
 export default MessageModel;

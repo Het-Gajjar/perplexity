@@ -89,6 +89,7 @@ body {
     flex-direction: column;
     position: relative;
     background: radial-gradient(circle at top, rgba(30, 30, 30, 0.4) 0%, var(--bg-main) 100%);
+    webkit-scrollbar: none;
 }
 
 .messages-container {
@@ -103,12 +104,16 @@ body {
     width: 100%;
 }
 
-.messages-container::-webkit-scrollbar {
-    width: 6px;
+.messages-container {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
 }
-.messages-container::-webkit-scrollbar-thumb {
-    background-color: var(--bg-surface-hover);
-    border-radius: 10px;
+
+.messages-container::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari */
 }
 
 /* Message Styles */
@@ -198,6 +203,86 @@ body {
 
 /* Animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Perplexity-style Thinking Loader */
+.thinking-message {
+    padding: 12px 16px !important;
+}
+
+.thinking-loader {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.thinking-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-secondary);
+    animation: thinking-bounce 1.4s infinite ease-in-out;
+}
+
+.thinking-dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.thinking-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.thinking-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes thinking-bounce {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+
+    30% {
+        transform: translateY(-8px);
+        opacity: 1;
+    }
+}
+
+/* Disabled input state */
+.input-box--disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.input-box--disabled .chat-input {
+    cursor: not-allowed;
+}
+
+/* Send button spinner */
+.send-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--bg-main);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }

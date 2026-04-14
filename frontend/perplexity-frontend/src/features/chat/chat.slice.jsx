@@ -17,9 +17,9 @@ const chatSlice = createSlice({
             state.chats[chatId] = { id: chatId, title, messages: [] }
         },
         addMessages: (state, action) => {
-            const { chatId, content, role } = action.payload
+            const { chatId, content, imageUrl = null, role } = action.payload
             if (state.chats[chatId]) {
-                state.chats[chatId].messages.push({ content, role })
+                state.chats[chatId].messages.push({ content, imageUrl, role })
             }
         },
         setCurrentChat: (state, action) => {

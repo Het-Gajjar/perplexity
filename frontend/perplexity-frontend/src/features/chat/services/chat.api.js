@@ -5,10 +5,17 @@ const api = axios.create({
     withCredentials: true,
 })
 
-export async function sendMessage(message, chatId) {
-    console.log(chatId)
+export async function sendMessage(message, chatId, imageFile = null) {
+    const formData = new FormData();
+    formData.append("message", message);
+    if (imageFile) {
+        formData.append("image", imageFile);
+    }
+    if (chatId) {
+        formData.append("chat", chatId);
+    }
     try {
-        const response = (await api.post('/message', { message, chat: chatId }))
+        const response = (await api.post('/message', formData))
         return response.data
     } catch (error) {
         console.error("Send message error:", error)

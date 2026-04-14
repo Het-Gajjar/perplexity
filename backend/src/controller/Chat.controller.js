@@ -1,15 +1,30 @@
-
 import AiService from "../services/Ai.service.js";
 import ChatModel from "../model/chat.model.js";
 import MessageModel from "../model/message.model.js";
+import { uploadImage } from "../services/imagekit.service.js";
 
 export async function getmessageResponce(req, res) {
     try {
         const { message, chat: chatId } = req.body
+        const imageFile = req.file
 
         let chat = null;
         let title = null;
         let currentChatId = chatId;
+
+
+        let imageUrl = null;
+
+        if (imageFile) {
+            const fileName = `chat-${Date.now()}-${imageFile.originalname}`;
+            imageUrl = await uploadImage(imageFile.buffer, fileName);
+        }
+
+
+        const imageBase64 = imageFile
+            ? imageFile.buffer.toString("base64")
+            : null;
+        const imageMimeType = imageFile?.mimetype;
 
         console.log(message)
         if (!chatId) {
@@ -24,6 +39,7 @@ export async function getmessageResponce(req, res) {
         const userMessage = await MessageModel.create({
             chat: currentChatId,
             content: message,
+            imageUrl,
             role: "user"
         })
 
@@ -32,7 +48,7 @@ export async function getmessageResponce(req, res) {
         })
 
         console.log(allmessage)
-        const responseText = await AiService.generateResponce(allmessage)
+        const responseText = await AiService.generateResponce(allmessage, imageBase64, imageMimeType)
 
 
 

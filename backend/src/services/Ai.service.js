@@ -21,6 +21,8 @@ const mistral = new ChatMistralAI({
   apiKey: process.env.MISTRAL_API_KEY,
 });
 
+
+
 const internetSearchTool = tool(
   internetSearch,
   {
@@ -35,7 +37,7 @@ const internetSearchTool = tool(
 )
 
 const agent = createAgent({
-  model: mistral,
+  model: gemini,
   tools: [internetSearchTool],
 
 })
@@ -44,27 +46,28 @@ const agent = createAgent({
 
 
 
-async function generateResponce(messages) {
-  const response = await agent.invoke({
-    systemMessage: new SystemMessage({
-      content: `
-      You are a helpful assistant who can answer questions and provide information based on Internet Search.
-      `
-    }),
+async function generateResponce(messages, imageBase64 = null, mimetype = null) {
 
-    messages: messages.map(message => {
-      if (message.role === "user") {
-        return new HumanMessage(message.content || "")
-      }
-      else if (message.role === "ai") {
-        return new AIMessage(message.content || "")
-      }
-      // Fallback if role is missing
-      return new HumanMessage(message.content || "")
-    })
-  });
+  const history = messages.slice(0, -1).map(msg =>
+    msg.role === "user"
+      ? new HumanMessage(msg.content)
+      : new AIMessage(msg.content)
+  );
 
-  return response.messages[response.messages.length - 1].text;
+  const lastMsg = messages[messages.length - 1];
+  let lastContent = [{ type: "text", text: lastMsg.content }];
+  if (imageBase64) {
+    lastContent.push({
+      type: "image_url",
+      image_url: `data:${mimetype};base64,${imageBase64}`,
+    });
+  }
+
+  const response = await gemini.invoke([   // Use gemini (vision), not mistral agent
+    ...history,
+    new HumanMessage({ content: lastContent }),
+  ]);
+  return response.content;
 }
 
 async function generateTitle(message) {
