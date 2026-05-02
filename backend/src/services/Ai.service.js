@@ -3,7 +3,6 @@ import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages
 import { ChatMistralAI } from "@langchain/mistralai"
 import * as z from "zod"
 import { tool, createAgent } from "langchain"
-import { name } from "ejs";
 import { internetSearch } from "./Internet.service.js";
 
 
@@ -12,7 +11,7 @@ import { internetSearch } from "./Internet.service.js";
 
 
 const gemini = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-flash-lite",
+  model: "gemini-2.0-flash",
   apiKey: process.env.GEMINI_API_KEY,
 });
 
@@ -27,20 +26,43 @@ const internetSearchTool = tool(
   internetSearch,
   {
     name: "internetSearch",
-    description: "Search the internet for information",
+    description: "Search the internet for real-time, current, or recent information. MUST be used for: current date/time, latest news, live prices, weather, recent events, or anything that may have changed after training.",
     schema: z.object({
       query: z.string().describe("The query to search the internet for")
     })
-
   }
-
 )
 
-const agent = createAgent({
-  model: gemini,
-  tools: [internetSearchTool],
+const SYSTEM_PROMPT = `You are an AI assistant with access to an internetSearch tool.
 
-})
+MANDATORY RULE:
+
+1. For EVERY user query:
+   → You MUST call the internetSearch tool first.
+
+2. Do NOT answer any question from your internal knowledge.
+   - Even for simple or known questions
+   - Always rely on the tool
+
+3. Workflow:
+   - Step 1: Call internetSearch with a relevant query
+   - Step 2: Analyze the tool result
+   - Step 3: Generate the final answer ONLY using the tool result
+
+4. Never skip the tool call.
+5. Never guess or hallucinate information.
+6. Never answer directly without tool usage.
+
+7. If the tool fails or returns empty:
+   - Clearly say: "I couldn't fetch real-time data. Please try again."
+
+Your goal is to always provide answers based on real-time internet data using the internetSearch tool only.`;
+
+const agent = createAgent({
+  model: mistral,
+  tools: [internetSearchTool],
+  systemPrompt: SYSTEM_PROMPT,
+});
 
 
 
@@ -63,11 +85,13 @@ async function generateResponce(messages, imageBase64 = null, mimetype = null) {
     });
   }
 
-  const response = await gemini.invoke([   // Use gemini (vision), not mistral agent
-    ...history,
-    new HumanMessage({ content: lastContent }),
-  ]);
-  return response.content;
+  const response = await agent.invoke({
+    messages: [
+      ...history,
+      new HumanMessage({ content: lastContent }),
+    ],
+  });
+  return response.messages[response.messages.length - 1].content;
 }
 
 async function generateTitle(message) {
