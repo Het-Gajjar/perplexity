@@ -6,10 +6,17 @@ const messageSchema = new mongoose.Schema({
         ref: "Chat",
         required: true,
     },
-    content: {
-        type: String,
-        required: true,
-    },
+    content: [
+        {
+            type: {
+                type: String,
+                enum: ["text", "reference"],
+                required: true,
+            },
+            text: String,
+            referenceIds: [Number],
+        }
+    ],
     imageUrl: {
         type: String,
         default: null,

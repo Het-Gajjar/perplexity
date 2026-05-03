@@ -70,14 +70,22 @@ const agent = createAgent({
 
 async function generateResponce(messages, imageBase64 = null, mimetype = null) {
 
-  const history = messages.slice(0, -1).map(msg =>
-    msg.role === "user"
-      ? new HumanMessage(msg.content)
-      : new AIMessage(msg.content)
-  );
+  const history = messages.slice(0, -1).map(msg => {
+    const textContent = Array.isArray(msg.content)
+      ? msg.content.map(c => c.text).join("")
+      : msg.content;
+    
+    return msg.role === "user"
+      ? new HumanMessage(textContent)
+      : new AIMessage(textContent);
+  });
 
   const lastMsg = messages[messages.length - 1];
-  let lastContent = [{ type: "text", text: lastMsg.content }];
+  const lastMsgText = Array.isArray(lastMsg.content)
+    ? lastMsg.content.map(c => c.text).join("")
+    : lastMsg.content;
+
+  let lastContent = [{ type: "text", text: lastMsgText }];
   if (imageBase64) {
     lastContent.push({
       type: "image_url",

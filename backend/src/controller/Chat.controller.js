@@ -38,7 +38,7 @@ export async function getmessageResponce(req, res) {
 
         const userMessage = await MessageModel.create({
             chat: currentChatId,
-            content: message,
+            content: [{ type: "text", text: message }],
             imageUrl,
             role: "user"
         })
@@ -54,7 +54,7 @@ export async function getmessageResponce(req, res) {
 
         const AIMessage = await MessageModel.create({
             chat: currentChatId,
-            content: responseText,
+            content: [{ type: "text", text: responseText }],
             role: "ai"
         })
 

@@ -23,8 +23,17 @@ export const useChat = () => {
             }
 
             // Use the real ImageKit URL from the server (permanent CDN URL)
-            dispatch(addMessages({ chatId: resolvedChatId, content: message, imageUrl: userMessage?.imageUrl || null, role: "user" }))
-            dispatch(addMessages({ chatId: resolvedChatId, content: AIMessage.content, role: "ai" }))
+            dispatch(addMessages({ 
+                chatId: resolvedChatId, 
+                content: [{ type: "text", text: message }], 
+                imageUrl: userMessage?.imageUrl || null, 
+                role: "user" 
+            }))
+            dispatch(addMessages({ 
+                chatId: resolvedChatId, 
+                content: AIMessage.content, 
+                role: "ai" 
+            }))
 
             dispatch(setLoading(false))
             return response

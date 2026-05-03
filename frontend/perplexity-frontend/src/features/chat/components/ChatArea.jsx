@@ -77,10 +77,20 @@ const ChatArea = ({ messages = [] }) => {
                                                 className="message-image"
                                             />
                                         )}
-                                        {msg.content}
+                                        {Array.isArray(msg.content) ? (
+                                            msg.content.map((c, i) => (
+                                                c.type === "text" ? <span key={i}>{c.text}</span> : null
+                                            ))
+                                        ) : (
+                                            msg.content
+                                        )}
                                     </>
                                 ) : (
-                                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                    <ReactMarkdown>
+                                        {Array.isArray(msg.content) 
+                                            ? msg.content.map(c => c.text).join("") 
+                                            : msg.content}
+                                    </ReactMarkdown>
                                 )}
                             </div>
                         ))
