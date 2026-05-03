@@ -1,11 +1,11 @@
 import { Server } from "socket.io";
 
-
 let io;
+
 export function initsocket(httpserver) {
     io = new Server(httpserver, {
         cors: {
-            origin: "https://query-nova-ai.vercel.app",
+            origin: true, // ✅ allow all Vercel + localhost
             credentials: true,
         },
     });
@@ -13,8 +13,12 @@ export function initsocket(httpserver) {
     console.log("Socket server is running");
 
     io.on("connection", (socket) => {
-        console.log("User connected", socket.id);
-    })
+        console.log("User connected:", socket.id);
+
+        socket.on("disconnect", () => {
+            console.log("User disconnected:", socket.id);
+        });
+    });
 }
 
 export function getIO() {

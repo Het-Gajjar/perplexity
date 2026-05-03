@@ -1,6 +1,6 @@
 import express from 'express';
 import connectDB from './config/database.js';
-import cookie from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import AuthRouter from './routes/Auth.routes.js';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -8,31 +8,29 @@ import chatRouter from './routes/chat.routes.js';
 
 const app = express();
 
+// Middleware
 app.use(express.json());
 app.use(morgan("dev"));
 
-const allowedOrigins = [
-  "http://localhost:5174",
-  "https://query-nova-ai.vercel.app",
-  "https://query-nova-l5exods56-het-gajjars-projects-259133d0.vercel.app"
-];
-
+// ✅ CORS FIX (IMPORTANT)
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS not allowed"));
-    }
-  },
-  credentials: true
+  origin: true, // dynamically allow frontend (Vercel + localhost)
+  credentials: true,
 }));
 
+// ✅ Handle preflight requests
 app.options("*", cors());
 
-app.use(cookie());
+// Cookies
+app.use(cookieParser());
 
+// Routes
 app.use('/api/auth', AuthRouter);
 app.use('/api/chats', chatRouter);
+
+// Test route (optional)
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
 
 export default app;
