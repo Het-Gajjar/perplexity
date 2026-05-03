@@ -14,12 +14,32 @@ app.use(morgan("dev"));
 
 // ✅ CORS FIX (IMPORTANT)
 app.use(cors({
-  origin: true, // dynamically allow frontend (Vercel + localhost)
+  origin: (origin, callback) => {
+    // List of allowed origins
+    const allowedOrigins = [
+      'http://localhost:5174',
+      'http://localhost:5173',
+      'https://query-nova-l5exods56-het-gajjars-projects-259133d0.vercel.app',
+      'https://query-nova-ai.vercel.app'
+    ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked request from origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 
-// ✅ Handle preflight requests
-app.options("/*", cors());
+
+
 // Cookies
 app.use(cookieParser());
 
