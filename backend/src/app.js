@@ -18,7 +18,7 @@ app.use(morgan("dev"));
 
 app.use(cors(
     {
-        origin: "http://localhost:5174",
+        origin: "https://query-nova-ai.vercel.app/",
         credentials: true,
     }
 ))
