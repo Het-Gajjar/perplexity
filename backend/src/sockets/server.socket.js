@@ -5,7 +5,7 @@ let io;
 export function initsocket(httpserver) {
     io = new Server(httpserver, {
         cors: {
-            origin: "https://query-nova-ai.vercel.app/",
+            origin: "https://query-nova-ai.vercel.app",
             credentials: true,
         },
     });
