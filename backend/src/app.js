@@ -13,7 +13,8 @@ app.use(morgan("dev"));
 
 const allowedOrigins = [
   "http://localhost:5174",
-  "https://query-nova-ai.vercel.app"
+  "https://query-nova-ai.vercel.app",
+  "https://query-nova-l5exods56-het-gajjars-projects-259133d0.vercel.app"
 ];
 
 app.use(cors({
